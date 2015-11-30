@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require 'malady'
+
+prompt = 'malady> '
+print prompt
+
+while input = gets
+  ast = Malady::Reader.read_str(input)
+  output = Malady::Evaluator.eval_with_repl_env(ast)
+  puts output
+  print prompt
+end
