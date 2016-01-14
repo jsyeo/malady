@@ -22,8 +22,8 @@ module Malady
       rest = sexp[1..-1]
       if type == :list
         parsed_list = parse_sexp(sexp)
-        fn = parsed_list[1]
-        args = parsed_list[2..-1]
+        fn = parsed_list.first
+        args = parsed_list[1..-1]
         fn.new(@filename, @line, *args)
       else
         parse_sexp(sexp)
@@ -39,7 +39,7 @@ module Malady
       when :integer
         Malady::AST::IntegerNode.new @filename, @line, sexp[1]
       when :list
-        [:list] + rest.map { |sexp| parse(sexp) }
+        rest.map { |sexp| parse(sexp) }
       end
     end
 
