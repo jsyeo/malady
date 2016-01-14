@@ -1,34 +1,5 @@
 require 'spec_helper'
 
-describe Malady::Reader, '#peek' do
-  it 'returns the token at the current position' do
-    string = '(+ 3 3)'
-    tokens = Malady::Reader.tokenizer(string)
-    expect(Malady::Reader.new(tokens).peek).to eq('(')
-  end
-end
-
-describe Malady::Reader, '#next' do
-  let(:tokens) { ['(', '+', '3', '3', ')'] }
-
-  it 'returns the next token' do
-    expect(Malady::Reader.new(tokens).next).to eq('(')
-  end
-
-  it 'increments the position' do
-    reader = Malady::Reader.new(tokens)
-    pos = reader.pos
-    reader.next
-    expect(reader.pos).to eq(pos + 1)
-  end
-
-  it 'returns nil when there are no more tokens' do
-    reader = Malady::Reader.new(['123'])
-    reader.next
-    expect(reader.next).to be_nil
-  end
-end
-
 describe Malady::Reader, '.tokenizer' do
   def tokenize(string)
     Malady::Reader.tokenizer(string)
@@ -74,10 +45,13 @@ describe Malady::Reader, '.read_str' do
   end
 
   it 'tokenizes a nested expression' do
-    expect(read_str('(+ 3 (* 4 5))')).to eq(
+    expect(read_str('(+ (* 2 3) (* 4 5))')).to eq(
       [:list,
        [:symbol, '+'],
-       [:integer, 3],
+       [:list,
+        [:symbol, '*'],
+        [:integer, 2],
+        [:integer, 3]],
        [:list,
         [:symbol, '*'],
         [:integer, 4],
