@@ -35,11 +35,17 @@ module Malady
     end
 
     class SymbolNode < Node
-      attr_reader :value
+      attr_reader :name
 
-      def initialize(filename, line, value)
+      def initialize(filename, line, name)
         super
-        @value = value
+        @name = name
+      end
+
+      def bytecode(g)
+        pos(g)
+        local = g.state.scope.search_local(name)
+        local.get_bytecode(g)
       end
     end
 
@@ -100,6 +106,23 @@ module Malady
         lhs.bytecode(g)
         rhs.bytecode(g)
         g.send(:*, 1)
+      end
+    end
+
+    class AssignNode < Node
+      attr_reader :name, :value
+
+      def initialize(filename, line, name, value)
+        super
+        @name = name
+        @value = value
+      end
+
+      def bytecode(g)
+        pos(g)
+        value.bytecode(g)
+        local = g.state.scope.new_local(name)
+        local.reference.set_bytecode(g)
       end
     end
   end

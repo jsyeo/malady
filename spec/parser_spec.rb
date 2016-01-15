@@ -23,7 +23,7 @@ describe Malady::Parser, '.parse_string' do
     exp = parse_string('abc').body.first
 
     expect(exp).to be_kind_of(Malady::AST::SymbolNode)
-    expect(exp.value).to eq('abc')
+    expect(exp.name).to eq('abc')
   end
 
   it 'parses a complex nested expression into Malady AST nodes' do
@@ -40,5 +40,26 @@ describe Malady::Parser, '.parse_string' do
     expect(rhs).to be_kind_of(Malady::AST::MultiplyNode)
     expect(rhs.lhs.value).to eq(2)
     expect(rhs.rhs.value).to eq(5)
+  end
+
+  it 'parses a def! expression into an AssignNode' do
+    exp = parse_string('(def! a 42)').body.first
+
+    expect(exp).to be_kind_of(Malady::AST::AssignNode)
+    expect(exp.name).to eq('a')
+    val = exp.value
+    expect(val).to be_kind_of(Malady::AST::IntegerNode)
+    expect(val.value).to eq(42)
+  end
+
+  it 'parses a nested def! expression' do
+    exp = parse_string('(def! a (+ 40 2))').body.first
+
+    expect(exp).to be_kind_of(Malady::AST::AssignNode)
+    expect(exp.name).to eq('a')
+    val = exp.value
+    expect(val).to be_kind_of(Malady::AST::AddNode)
+    expect(val.lhs.value).to eq(40)
+    expect(val.rhs.value).to eq(2)
   end
 end

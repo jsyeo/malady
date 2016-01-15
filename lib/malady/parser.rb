@@ -39,8 +39,21 @@ module Malady
       when :integer
         Malady::AST::IntegerNode.new @filename, @line, sexp[1]
       when :list
-        rest.map { |sexp| parse(sexp) }
+        symbol = rest.first
+        # Special handling for special forms
+        if symbol[1] == 'def!'
+          parse_def(sexp)
+        else
+          rest.map { |sexp| parse(sexp) }
+        end
       end
+    end
+
+    def parse_def(sexp)
+      # [:list, [:symbol, 'def!'], [:symbol, 'blah'], sexp]
+      symbol = sexp[2][1]
+      value = sexp[3]
+      [@symbols['def!'], symbol, parse(value)]
     end
 
     def builtins
@@ -48,7 +61,8 @@ module Malady
         '+' => Malady::AST::AddNode,
         '-' => Malady::AST::MinusNode,
         '/' => Malady::AST::DivideNode,
-        '*' => Malady::AST::MultiplyNode
+        '*' => Malady::AST::MultiplyNode,
+        'def!' => Malady::AST::AssignNode
       }
     end
 
