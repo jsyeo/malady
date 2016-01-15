@@ -59,5 +59,3 @@ describe Malady::Reader, '.read_str' do
     )
   end
 end
-
-
