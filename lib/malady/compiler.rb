@@ -69,14 +69,6 @@ module Malady
       ensure
         @processor = Malady::Generator
       end
-
-      def run
-        @output = @processor.new
-        @input.variable_scope = @variable_scope
-        @input.bytecode @output
-        @output.close
-        run_next
-      end
     end
 
     # String -> AST
