@@ -7,7 +7,7 @@ prompt = 'malady> '
 print prompt
 
 while input = gets
-  output = Malady::Compiler.eval(input)
+  output = Malady::Compiler.eval(input, '(eval)', Object.send(:binding))
   puts output
   print prompt
 end
