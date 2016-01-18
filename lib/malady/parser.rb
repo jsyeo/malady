@@ -41,8 +41,11 @@ module Malady
       when :list
         symbol = rest.first
         # Special handling for special forms
-        if symbol[1] == 'def!'
+        case symbol[1]
+        when 'def!'
           parse_def(sexp)
+        when 'let*'
+          parse_let(sexp)
         else
           rest.map { |sexp| parse(sexp) }
         end
@@ -54,6 +57,14 @@ module Malady
       symbol = sexp[2][1]
       value = sexp[3]
       [@symbols['def!'], symbol, parse(value)]
+    end
+
+    def parse_let(sexp)
+      # [:list, [:symbol, 'let'], [:list, [:symbol, 'c'], sexp], sexp]
+      symbols = sexp[2][1..-1].each_slice(2).to_a
+      body = sexp[3]
+      parsed_symbols = symbols.map { |s, val| [s[1], parse(val)] }
+      [Malady::AST::LetNode, parsed_symbols, parse(body)]
     end
 
     def builtins

@@ -24,4 +24,10 @@ describe Malady::Compiler, '.eval' do
     eval_with_binding('(def! a 40)', Object.send(:binding))
     expect(eval_with_binding('(+ a 2)', Object.send(:binding))).to eql(42)
   end
+
+  it 'evaluates an expression in the context of a let binding' do
+    expect(eval('(let* (a (+ 20 1)
+                        b 2)
+                   (* a b))')).to eql(42)
+  end
 end

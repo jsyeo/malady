@@ -125,5 +125,80 @@ module Malady
         local.reference.set_bytecode(g)
       end
     end
+
+    class LetNode < Node
+      attr_reader :bindings, :body
+
+      def initialize(filename, line, bindings, body)
+        super
+        @bindings = bindings
+        @body = body
+        @identifiers = @bindings.map(&:first)
+        @values = @bindings.map(&:last)
+      end
+
+      def bytecode(g)
+        pos(g)
+
+        scope = Malady::Scope.new
+        state = g.state
+        state.scope.nest_scope scope
+
+        blk = new_block_generator(g, @bindings)
+
+        blk.push_state scope
+        blk.state.push_super state.super
+        blk.state.push_eval state.eval
+
+        blk.state.push_name blk.name
+
+        blk.required_args = @bindings.count
+        blk.post_args = @bindings.count
+        blk.total_args = @bindings.count
+        blk.cast_for_multi_block_arg unless @bindings.count.zero?
+
+        @identifiers.each do |id|
+          blk.shift_array
+          local = blk.state.scope.new_local(id.to_s)
+          blk.set_local local.slot
+          blk.pop
+        end
+        blk.pop unless @bindings.empty?
+
+        blk.state.push_block
+
+        body.bytecode(blk)
+
+        blk.state.pop_block
+        blk.ret
+
+        blk.local_names = blk.state.scope.local_names
+        blk.local_count = blk.state.scope.local_count
+        blk.pop_state
+        blk.close
+
+        g.create_block blk
+
+        @values.each do |val|
+          val.bytecode(g)
+        end
+
+        g.send :call, @bindings.count
+      end
+
+      def new_block_generator(g, arguments)
+        blk = g.class.new
+        blk.name = g.state.name || :__block__
+        blk.file = g.file
+        blk.for_block = true
+
+        blk.required_args = arguments.count
+        blk.post_args = arguments.count
+        blk.total_args = arguments.count
+        blk.cast_for_multi_block_arg unless arguments.count.zero?
+
+        blk
+      end
+    end
   end
 end
