@@ -67,10 +67,11 @@ describe Malady::Parser, '.parse_string' do
     exp = parse_string('(let* (a 123) a)').body.first
 
     expect(exp).to be_kind_of(Malady::AST::LetNode)
-    sym_val_pair = exp.symbols.first
-    expect(sym_val_pair.first).to eql('a')
-    expect(sym_val_pair[1]).to be_kind_of(Malady::AST::IntegerNode)
-    expect(sym_val_pair[1].value).to eq(123)
+
+    a_id = exp.identifiers.first
+    expect(a_id).to eql('a')
+    expect(exp.values.first).to be_kind_of(Malady::AST::IntegerNode)
+    expect(exp.values.first.value).to eq(123)
 
     body = exp.body
     expect(body).to be_kind_of(Malady::AST::SymbolNode)
@@ -81,14 +82,14 @@ describe Malady::Parser, '.parse_string' do
     exp = parse_string('(let* (a (+ 20 1) b 2) (* a b))').body.first
 
     expect(exp).to be_kind_of(Malady::AST::LetNode)
-    a = exp.symbols.first
-    expect(a.first).to eql('a')
-    expect(a[1]).to be_kind_of(Malady::AST::AddNode)
+    a_id = exp.identifiers.first
+    expect(a_id).to eql('a')
+    expect(exp.values.first).to be_kind_of(Malady::AST::AddNode)
 
-    b = exp.symbols[1]
-    expect(b.first).to eql('b')
-    expect(b[1]).to be_kind_of(Malady::AST::IntegerNode)
-    expect(b[1].value).to eq(2)
+    b = exp.identifiers.last
+    expect(b).to eql('b')
+    expect(exp.values.last).to be_kind_of(Malady::AST::IntegerNode)
+    expect(exp.values.last.value).to eq(2)
 
     body = exp.body
     expect(body).to be_kind_of(Malady::AST::MultiplyNode)

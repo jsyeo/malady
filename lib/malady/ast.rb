@@ -127,7 +127,7 @@ module Malady
     end
 
     class LetNode < Node
-      attr_reader :bindings, :body
+      attr_reader :bindings, :body, :identifiers, :values
 
       def initialize(filename, line, bindings, body)
         super
