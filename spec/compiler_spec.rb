@@ -30,4 +30,16 @@ describe Malady::Compiler, '.eval' do
                         b 2)
                    (* a b))')).to eql(42)
   end
+
+  it 'evaluates a if expression to its then branch when condition is true' do
+    expect(eval('(if (< 2 10)
+                     42
+                     88)')).to eql(42)
+  end
+
+  it 'evaluates a if expression to its else branch when condition is false' do
+    expect(eval('(if (< 10 2)
+                     42
+                     88)')).to eql(88)
+  end
 end

@@ -200,5 +200,55 @@ module Malady
         blk
       end
     end
+
+    class TrueBooleanNode < Node
+      def bytecode(g)
+        pos(g)
+        g.push_true
+      end
+    end
+
+    class FalseBooleanNode < Node
+      def bytecode(g)
+        pos(g)
+        g.push_false
+      end
+    end
+
+    class IfNode < Node
+      attr_reader :condition, :then_branch, :else_branch
+      def initialize(filename, line, condition, then_branch, else_branch)
+        super
+        @condition = condition
+        @then_branch = then_branch
+        @else_branch = else_branch
+      end
+
+      def bytecode(g)
+        pos(g)
+
+        end_label = g.new_label
+        else_label = g.new_label
+
+        condition.bytecode(g)
+        g.goto_if_false else_label
+        then_branch.bytecode(g)
+        g.goto end_label
+
+        else_label.set!
+        else_branch.bytecode(g)
+
+        end_label.set!
+      end
+    end
+
+    class LessThanNode < BinaryNode
+      def bytecode(g)
+        pos(g)
+        lhs.bytecode(g)
+        rhs.bytecode(g)
+        g.send(:<, 1)
+      end
+    end
   end
 end

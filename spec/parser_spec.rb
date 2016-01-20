@@ -98,4 +98,35 @@ describe Malady::Parser, '.parse_string' do
     expect(body.rhs).to be_kind_of(Malady::AST::SymbolNode)
     expect(body.rhs.name).to eq('b')
   end
+
+  it 'parses boolean values' do
+    exp = parse_string('true').body.first
+    expect(exp).to be_kind_of(Malady::AST::TrueBooleanNode)
+
+    exp = parse_string('false').body.first
+    expect(exp).to be_kind_of(Malady::AST::FalseBooleanNode)
+  end
+
+  it 'parses a less than operator' do
+    exp = parse_string('(< 2 10)').body.first
+    expect(exp).to be_kind_of(Malady::AST::LessThanNode)
+    expect(exp.lhs).to be_kind_of(Malady::AST::IntegerNode)
+    expect(exp.lhs.value).to eql(2)
+
+    expect(exp.rhs).to be_kind_of(Malady::AST::IntegerNode)
+    expect(exp.rhs.value).to eql(10)
+  end
+
+  it 'parses a if expression' do
+    exp = parse_string('(if (< 2 10) 42 88)').body.first
+    expect(exp).to be_kind_of(Malady::AST::IfNode)
+
+    expect(exp.condition).to be_kind_of(Malady::AST::LessThanNode)
+
+    expect(exp.then_branch).to be_kind_of(Malady::AST::IntegerNode)
+    expect(exp.then_branch.value).to eql(42)
+
+    expect(exp.else_branch).to be_kind_of(Malady::AST::IntegerNode)
+    expect(exp.else_branch.value).to eql(88)
+  end
 end

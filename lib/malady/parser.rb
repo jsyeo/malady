@@ -5,10 +5,6 @@ module Malady
     def initialize(filename)
       @filename = filename
       @line = 0
-      @symbols = Hash.new do |hash, key|
-        Malady::AST::SymbolNode.new @filename, @line, key
-      end
-      @symbols = @symbols.merge builtins
     end
 
     def parse_string(string)
@@ -26,6 +22,8 @@ module Malady
           parse_def(sexp)
         when 'let*'
           parse_let(sexp)
+        when 'if'
+          parse_if(sexp)
         else
           fn, *args = parse_sexp(sexp)
           apply(fn, args)
@@ -38,8 +36,16 @@ module Malady
     def parse_sexp(sexp)
       type, *rest = sexp
       case type
+      when :boolean
+        boolean = sexp.last
+        if boolean == :true
+          Malady::AST::TrueBooleanNode.new(@filename, @line)
+        else
+          Malady::AST::FalseBooleanNode.new(@filename, @line)
+        end
       when :symbol
-        @symbols[sexp[1]]
+        name = sexp.last
+        builtins.fetch(name, Malady::AST::SymbolNode.new(@filename, @line, name))
       when :integer
         Malady::AST::IntegerNode.new @filename, @line, sexp[1]
       when :list
@@ -62,6 +68,13 @@ module Malady
       Malady::AST::LetNode.new(@filename, @line, parsed_bindings, parse(body))
     end
 
+    def parse_if(sexp)
+      # [:list, [:symbol, 'if'], condition, then_branch, else_branch]
+      _, _, condition, then_branch, else_branch = sexp
+      p [condition, then_branch, else_branch]
+      Malady::AST::IfNode.new(@filename, @line, parse(condition), parse(then_branch), parse(else_branch))
+    end
+
     def apply(fn, args)
       fn.new(@filename, @line, *args)
     end
@@ -72,6 +85,7 @@ module Malady
         '-' => Malady::AST::MinusNode,
         '/' => Malady::AST::DivideNode,
         '*' => Malady::AST::MultiplyNode,
+        '<' => Malady::AST::LessThanNode,
       }
     end
 
