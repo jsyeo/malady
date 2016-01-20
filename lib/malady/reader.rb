@@ -37,6 +37,10 @@ module Malady
       case token
       when /^-?\d+$/
         [:integer, token.to_i]
+      when 'true'
+        [:boolean, :true]
+      when 'false'
+        [:boolean, :false]
       when /^\D+$/
         [:symbol, token]
       else

@@ -44,6 +44,11 @@ describe Malady::Reader, '.read_str' do
     expect(read_str('42')).to eq([:integer, 42])
   end
 
+  it 'converts booleans' do
+    expect(read_str('true')).to eq([:boolean, :true])
+    expect(read_str('false')).to eq([:boolean, :false])
+  end
+
   it 'tokenizes a nested expression' do
     expect(read_str('(+ (* 2 3) (* 4 5))')).to eq(
       [:list,
