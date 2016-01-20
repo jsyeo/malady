@@ -72,7 +72,6 @@ module Malady
         '-' => Malady::AST::MinusNode,
         '/' => Malady::AST::DivideNode,
         '*' => Malady::AST::MultiplyNode,
-        'def!' => Malady::AST::AssignNode
       }
     end
 
