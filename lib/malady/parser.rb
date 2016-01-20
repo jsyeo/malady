@@ -18,53 +18,52 @@ module Malady
     end
 
     def parse(sexp)
-      type = sexp.first
-      rest = sexp[1..-1]
+      type, *rest = sexp
       if type == :list
-        parsed_list = parse_sexp(sexp)
-        fn = parsed_list.first
-        args = parsed_list[1..-1]
-        fn.new(@filename, @line, *args)
-      else
-        parse_sexp(sexp)
-      end
-    end
-
-    def parse_sexp(sexp)
-      type = sexp.first
-      rest = sexp[1..-1]
-      case type
-      when :symbol
-        @symbols[sexp[1]]
-      when :integer
-        Malady::AST::IntegerNode.new @filename, @line, sexp[1]
-      when :list
         symbol = rest.first
-        # Special handling for special forms
         case symbol[1]
         when 'def!'
           parse_def(sexp)
         when 'let*'
           parse_let(sexp)
         else
-          rest.map { |sexp| parse(sexp) }
+          fn, *args = parse_sexp(sexp)
+          apply(fn, args)
         end
+      else
+        parse_sexp(sexp)
+      end
+    end
+
+    def parse_sexp(sexp)
+      type, *rest = sexp
+      case type
+      when :symbol
+        @symbols[sexp[1]]
+      when :integer
+        Malady::AST::IntegerNode.new @filename, @line, sexp[1]
+      when :list
+        rest.map { |sexp| parse(sexp) }
       end
     end
 
     def parse_def(sexp)
       # [:list, [:symbol, 'def!'], [:symbol, 'blah'], sexp]
-      symbol = sexp[2][1]
+      name = sexp[2][1]
       value = sexp[3]
-      [@symbols['def!'], symbol, parse(value)]
+      Malady::AST::AssignNode.new(@filename, @line, name, parse(value))
     end
 
     def parse_let(sexp)
       # [:list, [:symbol, 'let'], [:list, [:symbol, 'c'], sexp], sexp]
-      symbols = sexp[2][1..-1].each_slice(2).to_a
+      bindings = sexp[2][1..-1].each_slice(2).to_a
       body = sexp[3]
-      parsed_symbols = symbols.map { |s, val| [s[1], parse(val)] }
-      [Malady::AST::LetNode, parsed_symbols, parse(body)]
+      parsed_bindings = bindings.map { |s, val| [s[1], parse(val)] }
+      Malady::AST::LetNode.new(@filename, @line, parsed_bindings, parse(body))
+    end
+
+    def apply(fn, args)
+      fn.new(@filename, @line, *args)
     end
 
     def builtins
