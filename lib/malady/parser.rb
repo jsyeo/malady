@@ -24,6 +24,8 @@ module Malady
           parse_let(sexp)
         when 'if'
           parse_if(sexp)
+        when 'fn*'
+          parse_fn(sexp)
         else
           fn, *args = parse_sexp(sexp)
           apply(fn, args)
@@ -72,6 +74,13 @@ module Malady
       # [:list, [:symbol, 'if'], condition, then_branch, else_branch]
       _, _, condition, then_branch, else_branch = sexp
       Malady::AST::IfNode.new(@filename, @line, parse(condition), parse(then_branch), parse(else_branch))
+    end
+
+    def parse_fn(sexp)
+      # [:list, [:symbol, 'fn*'], [:list, [:symbol, 'x']], body]
+      _, _, (_, *arguments), body = sexp
+      arguments = arguments.map(&:last)
+      Malady::AST::FnNode.new(@filename, @line, arguments, parse(body))
     end
 
     def apply(fn, args)

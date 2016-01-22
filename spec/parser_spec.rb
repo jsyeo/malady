@@ -129,4 +129,15 @@ describe Malady::Parser, '.parse_string' do
     expect(exp.else_branch).to be_kind_of(Malady::AST::IntegerNode)
     expect(exp.else_branch.value).to eql(88)
   end
+
+  it 'parses a fn expression' do
+    exp = parse_string('(fn* [x y] (+ x y))').body.first
+    expect(exp).to be_kind_of(Malady::AST::FnNode)
+
+    expect(exp.arguments).to eql(['x', 'y'])
+
+    expect(exp.body).to be_kind_of(Malady::AST::AddNode)
+    expect(exp.body.lhs).to be_kind_of(Malady::AST::SymbolNode)
+    expect(exp.body.rhs).to be_kind_of(Malady::AST::SymbolNode)
+  end
 end

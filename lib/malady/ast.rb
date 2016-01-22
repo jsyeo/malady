@@ -266,5 +266,14 @@ module Malady
         g.send(:<, 1)
       end
     end
+
+    class FnNode < Node
+      attr_reader :arguments, :body
+
+      def initialize(filename, line, arguments, body)
+        @arguments = arguments
+        @body = body
+      end
+    end
   end
 end
