@@ -140,4 +140,13 @@ describe Malady::Parser, '.parse_string' do
     expect(exp.body.lhs).to be_kind_of(Malady::AST::SymbolNode)
     expect(exp.body.rhs).to be_kind_of(Malady::AST::SymbolNode)
   end
+
+  it 'parses a fn call' do
+    exp = parse_string('((fn* [x y] (+ x y)) 40 2)').body.first
+    expect(exp).to be_kind_of(Malady::AST::FunctionCallNode)
+
+    expect(exp.arguments.map(&:value)).to eql([40, 2])
+
+    expect(exp.function).to be_kind_of(Malady::AST::FnNode)
+  end
 end

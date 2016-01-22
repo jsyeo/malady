@@ -31,6 +31,12 @@ describe Malady::Compiler, '.eval' do
                    (* a b))')).to eql(42)
   end
 
+  it 'evaluates a nested let expresssion' do
+    expect(eval('(let* (b 2)
+                       (let* (a (+ 20 1))
+                             (* a b)))')).to eql(42)
+  end
+
   it 'evaluates a if expression to its then branch when condition is true' do
     expect(eval('(if (< 2 10)
                      42
@@ -41,5 +47,21 @@ describe Malady::Compiler, '.eval' do
     expect(eval('(if (< 10 2)
                      42
                      88)')).to eql(88)
+  end
+
+  it 'evaluates a fn* call' do
+    expect(eval('((fn* [x] (* x x)) 8)')).to eql(64)
+  end
+
+  it 'evaluates a named function call' do
+    malady_fib = <<-malady
+    (def! fib (fn* [x]
+                (if (< x 2)
+                    1
+                    (+ (fib (- x 1)) (fib (- x 2))))))
+    malady
+    eval_with_binding(malady_fib, Object.send(:binding))
+    result = eval_with_binding('(fib 8)', Object.send(:binding))
+    expect(result).to eql(34)
   end
 end

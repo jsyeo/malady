@@ -84,7 +84,11 @@ module Malady
     end
 
     def apply(fn, args)
-      fn.new(@filename, @line, *args)
+      if builtins.values.include? fn
+        fn.new(@filename, @line, *args)
+      else
+        Malady::AST::FunctionCallNode.new(@filename, @line, fn, args)
+      end
     end
 
     def builtins
