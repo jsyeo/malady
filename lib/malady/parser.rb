@@ -71,7 +71,6 @@ module Malady
     def parse_if(sexp)
       # [:list, [:symbol, 'if'], condition, then_branch, else_branch]
       _, _, condition, then_branch, else_branch = sexp
-      p [condition, then_branch, else_branch]
       Malady::AST::IfNode.new(@filename, @line, parse(condition), parse(then_branch), parse(else_branch))
     end
 
