@@ -137,52 +137,68 @@ module Malady
         @values = @bindings.map(&:last)
       end
 
+      # A LetNode is basically a closure with its arguments applied to the bindings
       def bytecode(g)
         pos(g)
 
+        # get a new scope
         scope = Malady::Scope.new
+
+        # nest the scope in the current context
         state = g.state
         state.scope.nest_scope scope
 
+        # get a new generator for our block
         blk = new_block_generator(g, @bindings)
 
+        # push our scope
         blk.push_state scope
+
+        # setup the state in our block
         blk.state.push_super state.super
         blk.state.push_eval state.eval
-
         blk.state.push_name blk.name
 
+        # some boiler plate for the block args
         blk.required_args = @bindings.count
         blk.post_args = @bindings.count
         blk.total_args = @bindings.count
-        blk.cast_for_multi_block_arg unless @bindings.count.zero?
+        blk.cast_for_multi_block_arg if !@bindings.count.zero?
 
+        # our args are locals in the block
         @identifiers.each do |id|
           blk.shift_array
           local = blk.state.scope.new_local(id.to_s)
           blk.set_local local.slot
           blk.pop
         end
-        blk.pop unless @bindings.empty?
+        blk.pop if !@bindings.empty?
 
+        # push the block
         blk.state.push_block
 
+        # compile the body of the closure in the block
         body.bytecode(blk)
 
+        # pop the block
         blk.state.pop_block
         blk.ret
 
+        # pop the state
         blk.local_names = blk.state.scope.local_names
         blk.local_count = blk.state.scope.local_count
         blk.pop_state
         blk.close
 
+        # create the block in our current generator
         g.create_block blk
 
+        # compile bindings' values
         @values.each do |val|
           val.bytecode(g)
         end
 
+        # send :call to the block
         g.send :call, @bindings.count
       end
 
