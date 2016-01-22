@@ -12,7 +12,7 @@ module Malady
     end
 
     def read_form(stream)
-      if stream.peek == '('
+      if stream.peek =~ /(\(|\[)/
         read_list(stream)
       else
         read_atom(stream.next)
@@ -20,10 +20,10 @@ module Malady
     end
 
     def read_list(stream)
-      raise 'Reader error: read_list called on non-list' if stream.next != '('
+      raise 'Reader error: read_list called on non-list' if stream.next !~ /(\(|\[)/
       list = [:list]
 
-      while stream.peek != ')'
+      while stream.peek !~ /(\)|\])/
         raise 'Reader error: Unmatched parens' if stream.eof?
         list << read_form(stream)
       end

@@ -60,7 +60,15 @@ describe Malady::Reader, '.read_str' do
        [:list,
         [:symbol, '*'],
         [:integer, 4],
-        [:integer, 5]]]
-    )
+        [:integer, 5]]])
+  end
+
+  it 'tokenizes both parens and square brackets' do
+    expect(read_str('(fn* [a] a)')).to eq(
+      [:list,
+       [:symbol, 'fn*'],
+       [:list,
+        [:symbol, 'a']],
+       [:symbol, 'a']])
   end
 end
