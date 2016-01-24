@@ -7,28 +7,27 @@ module Malady
 
     def read_str(string)
       tokens = tokenizer(string)
-      stream = Malady::TokenStream.new(tokens)
-      read_form(stream)
+      read_form(tokens)
     end
 
-    def read_form(stream)
-      if stream.peek =~ /(\(|\[)/
-        read_list(stream)
+    def read_form(tokens)
+      if tokens.first =~ /(\(|\[)/
+        read_list(tokens)
       else
-        read_atom(stream.next)
+        read_atom(tokens.shift)
       end
     end
 
-    def read_list(stream)
-      raise 'Reader error: read_list called on non-list' if stream.next !~ /(\(|\[)/
+    def read_list(tokens)
+      raise 'Reader error: read_list called on non-list' if tokens.shift !~ /(\(|\[)/
       list = [:list]
 
-      while stream.peek !~ /(\)|\])/
-        raise 'Reader error: Unmatched parens' if stream.eof?
-        list << read_form(stream)
+      while tokens.first !~ /(\)|\])/
+        raise 'Reader error: Unmatched parens' if tokens.empty?
+        list << read_form(tokens)
       end
 
-      stream.next # pop our closing paren
+      tokens.shift # pop our closing paren
 
       list
     end
