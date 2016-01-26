@@ -10,6 +10,8 @@ $ gem install malady
 
 ## Usage
 
+Use the `malady` binary provided in the `bin` directory to execute the malady repl.
+
 ```bash
 $ malady
 malady> (+ 42 88)
