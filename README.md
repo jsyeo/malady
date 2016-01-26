@@ -45,6 +45,10 @@ $ rspec
 Bug reports and pull requests are welcome on GitHub at https://github.com/jsyeo/malady.
 
 
+## Credits
+
+Inspired by [lani](https://github.com/queenfrankie/lani), a programming language in Rubinius.
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
