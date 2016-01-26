@@ -35,8 +35,8 @@ $ rspec
 
 ## To Do:
 
-[ ] Macros
-[ ] Import mal's test cases
+- [ ] Macros
+- [ ] Import mal's test cases
 
 ## Contributing
 
