@@ -37,6 +37,10 @@ $ rspec
 
 ## To Do:
 
+- [ ] Data structures
+  - [ ] Lists
+  - [ ] Hashes
+  - [ ] Symbols
 - [ ] Macros
 - [ ] Import mal's test cases
 
