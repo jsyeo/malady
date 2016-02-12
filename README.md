@@ -1,5 +1,7 @@
 # Malady
 
+[![Build Status](https://travis-ci.org/jsyeo/malady.svg?branch=master)](https://travis-ci.org/jsyeo/malady)
+
 Malady is an implementation of [mal](https://github.com/kanaka/mal) that compiles to [Rubinius](http://rubinius.com) bytecode.
 
 ## Installation
