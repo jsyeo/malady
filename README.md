@@ -10,12 +10,19 @@ $ gem install malady
 
 ## Usage
 
-Use the `malady` binary provided in the `bin` directory to execute the malady repl.
+Use the `malady` binary provided in the `bin` directory to start the malady repl.
 
-```bash
+```lisp
 $ malady
 malady> (+ 42 88)
 130
+malady> (def! fib (fn* [x]
+          (if (< x 2)
+              1
+              (+ (fib (- x 1)) (fib (- x 2))))))
+#<Rubinius::BlockEnvironment:0x30ac>
+malady> (fib 8)
+34
 malady>
 ```
 
