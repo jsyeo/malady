@@ -21,7 +21,7 @@ module Malady
       cm       = compile_eval(code, binding.variables, file, line)
       cm.scope = Rubinius::ConstantScope.new(Object)
       cm.name  = :__malady__
-      script   = Rubinius::CompiledMethod::Script.new(cm, file, true)
+      script   = Rubinius::CompiledCode::Script.new(cm, file, true)
       be       = Rubinius::BlockEnvironment.new
 
       script.eval_source  = code
