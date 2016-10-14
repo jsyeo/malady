@@ -1,2 +1,5 @@
 sudo: required
 language: ruby
+before_install:
+  - mktemp --version
+  - mktemp -d -t srcclr.XXX
